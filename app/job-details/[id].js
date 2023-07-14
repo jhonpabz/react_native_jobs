@@ -23,19 +23,42 @@ import styles from "../../styles/search";
 const tabs = ["About", "Qualifications", "Responsibilities"];
 
 const JobDetails = () => {
-  const params = useSearchParams();
+  const { id } = useSearchParams();
   const router = useRouter();
   const { data, error, isLoading, refetch } = useFetch("job-details", {
-    job_id: params.id,
+    job_id: id,
   });
+
+  useEffect(() => {
+    if (id) {
+      refetch();
+    }
+  }, [id]);
 
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const onRefresh = () => {};
+  console.log("activeTab", activeTab);
+  const displayTabContent = () => {
+    switch (activeTab) {
+      case "Qualifications":
+        return (
+          <Specifics
+            title="Qualifications"
+            points={data[0].job_highlights?.Qualifications ?? ["N/A"]}
+          />
+        );
 
-  useEffect(() => {
-    console.log("data", data);
-  }, [data]);
+      case "About":
+        return (
+          <JobAbout info={data[0].job_description ?? "No data provided"} />
+        );
+      case "Responsibilities":
+
+      default:
+        break;
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.lightWhite }}>
@@ -48,7 +71,7 @@ const JobDetails = () => {
             <ScreenHeaderBtn
               iconUrl={icons.left}
               dimension="60%"
-              onPress={() => router.back()}
+              handlePress={() => router.push(-1)}
             />
           ),
           headerRight: () => (
@@ -84,6 +107,8 @@ const JobDetails = () => {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
               />
+
+              {displayTabContent()}
             </View>
           )}
         </ScrollView>
