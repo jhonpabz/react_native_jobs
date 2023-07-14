@@ -35,5 +35,10 @@ export const useFetch = (endpoint, query) => {
     fetchData();
   }, []);
 
-  return { data, isLoading, error };
+  const refetch = () => {
+    setIsLoading(true);
+    fetchData();
+  };
+
+  return { data, isLoading, error, refetch };
 };
